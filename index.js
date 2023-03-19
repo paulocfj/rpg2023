@@ -1,7 +1,58 @@
+//import
 const prompt = require('prompt-sync')();
 
-let opcao;
+//const
+const personagens = new Array();
 
+class Personagem {
+    constructor(nome,raca, classe, nivel) {
+        this.nome = nome;
+        this.raca = raca;
+        this.classe = classe;
+        this.nivel = nivel;
+    }
+}
+ 
+function criarPersonagem() {
+    const nome = prompt("Informe o nome: ");
+    const raca = prompt("Informe a raça: ");
+    const classe = prompt("Informe a classe: ");
+    const nivel = 1;
+    const personagem = new Personagem(nome, raca, classe, nivel);
+    personagens.push(personagem);
+}
+
+function listarPersonagens() {
+    personagens.forEach((personagem) => {
+        console.log("Nome: ", personagem.nome);
+        console.log("Raça: ", personagem.raca);
+        console.log("Classe: ", personagem.classe);
+        console.log("Nivel: ", personagem.nivel);
+    });
+}
+
+function excluirPersonagem() {
+    const qtdPersonagens = personagens.length;
+
+    personagens.forEach(({nome}, index) => {
+        console.log(`${index} - Personagem: ${nome}`);
+    }); 
+
+    const nomeDoPersonagem = prompt("Informe o nome do personagem: ");
+
+    personagens.forEach((personagem, index) => {
+        if (personagem.nome === nomeDoPersonagem) {
+            personagens.splice(index,1);
+            console.log(`Personagem ${nomeDoPersonagem} excluido com sucesso!`);
+        }
+    });
+
+    if (qtdPersonagens === personagens.length) {
+        console.warn(`Personagem ${nomeDoPersonagem} não encontrado!`);
+    }
+}
+
+let opcao;
 do {
     //Menu
     console.clear();
@@ -22,22 +73,25 @@ do {
         case 1:
             console.clear();
             console.log("------------Criação de Personagem----------");
-            prompt("Aperte algum botão para continuar: ");
+            criarPersonagem();
+            prompt("Aperte algum botão para continua! ");
         break;
         case 2: 
             console.clear();
             console.log("------------Escolha de Personagem---------");
-            prompt("Aperte algum botão para continuar: ");
+            listarPersonagens();
+            prompt("Aperte algum botão para continuar! ");
         break;
         case 3:
             console.clear();
             console.log("------------Exclusão de Personagem--------");
-            prompt("Aperte algum botão para continuar: ");
+            excluirPersonagem();
+            prompt("Aperte algum botão para continuar! ");
         break
         default:
             console.clear();
-            console.log("------------Opção invalida--------");
-            prompt("Aperte algum botão para continuar: ");
+            console.warn("------------Opção invalida--------");
+            prompt("Aperte algum botão para continuar!");
         break;
     }
 
