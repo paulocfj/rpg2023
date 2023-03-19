@@ -26,11 +26,8 @@ function listarPersonagens() {
         return; 
     }
 
-    personagens.forEach((personagem) => {
-        console.log("Nome: ", personagem.nome);
-        console.log("Raça: ", personagem.raca);
-        console.log("Classe: ", personagem.classe);
-        console.log("Nivel: ", personagem.nivel);
+    personagens.forEach((personagem, index) => {
+        console.log(`${index} Nome:  ${personagem.nome} - Raça: ${personagem.raca} - classe: ${personagem.classe} - Nivel: ${personagem.nivel}`);
     });
 }
 
@@ -42,9 +39,7 @@ function excluirPersonagem() {
 
     const qtdPersonagens = personagens.length;
 
-    personagens.forEach(({nome}, index) => {
-        console.log(`${index} - Personagem: ${nome}`);
-    }); 
+    listarPersonagens();
 
     const nomeDoPersonagem = prompt("Informe o nome do personagem: ");
 
