@@ -1,16 +1,16 @@
-import { ClasseServico} from '../servico/classe.servico.js';
-import { RacaServico } from '../servico/raca.servico.js';
-import { PersonagemServico } from '../servico/personagem.servico.js';
-import { Personagem } from '../entidade/personagem.js';
+import { Personagem } from '../modelo/personagem.js';
+import { ClasseRepositorio } from '../repositorio/classe.repositorio.js';
+import { PersonagemRepositorio } from '../repositorio/personagem.repositorio.js';
+import { RacaRepositorio } from '../repositorio/raca.repositorio.js';
+
 import  promptSync  from 'prompt-sync';
 
-const racaServico = new RacaServico();
-const classeServico = new ClasseServico();
 const  prompt =  promptSync();
+const racaRepositorio = new RacaRepositorio();
+const classeRepositorio = new ClasseRepositorio();
+const personagemRepositorio = new PersonagemRepositorio();
 
 export const menuPersonagem = () => {
-    const persongemServico = new PersonagemServico();
-    
     let opcao;
 
     do {
@@ -30,37 +30,13 @@ export const menuPersonagem = () => {
                 console.log("------------Até logo Aventureiro!--------------------");
             break;
             case 1:
-                const novoPersonagem = new Personagem();
-
-                console.clear();
-                console.log("------------Criação de Personagem----------");
-
-                novoPersonagem.raca = informeRaca();
-                novoPersonagem.classe = informeClasse();
-                novoPersonagem.nome = prompt("Informe o nome: ");
-
-                persongemServico.criarPersonagem(novoPersonagem);
-
-                prompt("Aperte algum botão para continua! ");
+                criarFicha();
             break;
             case 2: 
-                console.clear();
-                console.log("------------Escolha de Personagem---------");
-                persongemServico.listarPersonagens();
-                prompt("Aperte algum botão para continuar! ");
+                escolherFicha();
             break;
             case 3:
-                console.clear();
-                console.log("------------Exclusão de Personagem--------");
-                persongemServico.listarPersonagens();
-                
-                if (persongemServico.existePersonagens()) {
-                    const nomeDoPersonagem = prompt("Informe o nome do personagem: ");
-
-                    persongemServico.excluirPersonagem(nomeDoPersonagem);
-                }
-                
-                prompt("Aperte algum botão para continuar! ");
+                excluirPersonagem();
             break
             default:
                 console.clear();
@@ -72,21 +48,85 @@ export const menuPersonagem = () => {
     } while(opcao != "0");
 }
 
+const criarFicha = () => {
+    const novoPersonagem = new Personagem();
+
+    console.clear();
+    console.log("------------Criação de Personagem----------");
+
+    novoPersonagem.raca = informeRaca();
+    novoPersonagem.classe = informeClasse();
+    novoPersonagem.nome = prompt("Informe o nome: ");
+
+    personagemRepositorio.criarPersonagem(novoPersonagem);
+
+    prompt("\nAperte algum botão para continua! ");
+}
+
+const  escolherFicha = () => {
+    console.clear();
+    console.log("------------Escolha de Personagem---------");
+
+    const personagens =  personagemRepositorio.listarPersonagens();
+
+    if (personagens.length > 0) {
+        personagens.forEach((personagem) => {
+            console.log(`ID: ${personagem.id} - Nome:  ${personagem.nome} - Raça: ${personagem.raca.nome} - classe: ${personagem.classe.nome} - Nivel: ${personagem.nivel}`);
+        });
+    } else {
+        console.log("A lista de personagens esta vazia!");
+    }   
+
+    prompt("\nAperte algum botão para continuar! ");
+}
+
+const excluirPersonagem = () => {
+    console.clear();
+    console.log("------------Exclusão de Personagem--------");
+
+    const personagens = personagemRepositorio.listarPersonagens();
+   
+    if (personagens.length > 0) {
+        personagens.forEach((personagem) => {
+            console.log(`ID: ${personagem.id} - Nome:  ${personagem.nome} - Raça: ${personagem.raca.nome} - classe: ${personagem.classe.nome} - Nivel: ${personagem.nivel}`);
+        })
+        const nomeDoPersonagem = prompt("Informe o nome do personagem: ");
+        const personagemExcluido = personagemRepositorio.excluirPersonagem(nomeDoPersonagem);
+
+        personagemExcluido
+            ? console.log(`\nPersonagem ${nomeDoPersonagem} excluído com sucesso!`)
+            : console.log(`\nPersonagem ${nomeDoPersonagem} não encontrado!`);
+
+    } else {
+        console.log("\nA lista de personagens esta vazia!");
+    }
+    
+    prompt("\nAperte algum botão para continuar! ");
+}
+
 const informeRaca = () => {
     let raca = null;
 
     do {
         console.log("---------Escolha a sua raça!----------");
 
-        racaServico.listarRacas();
+        const racas = racaRepositorio.listarRacas();
+        racas.forEach((raca) => {
+            let atributos = Object.entries(raca.atributos).map((atributo)=> {
+                return atributo[0]+' + '+atributo[1]+' ';
+            });
 
-        let numeroDaRaca = parseInt(prompt(":")); 
-        raca = racaServico.escolherRaca(numeroDaRaca);
+            console.log(`ID: ${raca.id} - Raça: ${raca.nome} - atributos: ${atributos.toString()}`);
+        });
 
-        if (!raca) {
-            console.clear();
-        }
-        
+        if (racas) {
+            const idRaca = parseInt(prompt(":")); 
+            raca = racaRepositorio.escolherRacaPorId(idRaca);
+
+            if (!raca) {
+                console.clear();
+            }
+        }      
     } while(!raca);
 
     return raca;
@@ -98,15 +138,20 @@ const informeClasse = () => {
     do {
         console.log("---------Escolha a sua Classe!----------");
 
-        classeServico.listarClasses();
+        const classes = classeRepositorio.listarClasses();
 
-        let numeroDaClasse = parseInt(prompt(":")); 
-        classe = classeServico.escolherClasse(numeroDaClasse);
+        classes.forEach((classe) => {
+            console.log(`ID: ${classe.id} - Classe: ${classe.nome} - Pontos de Vida: ${classe.pontosVida} - Pontos de Magia: ${classe.pontosMagia} `);
+        });
 
-        if (!classe) {
-            console.clear();
+        if (classes) {
+            const idClasse = parseInt(prompt(":")); 
+            classe = classeRepositorio.escolherClassePorId(idClasse);
+    
+            if (!classe) {
+                console.clear();
+            }    
         }
-        
     } while(!classe);
 
     return classe;

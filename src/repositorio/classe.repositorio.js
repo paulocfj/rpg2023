@@ -1,22 +1,13 @@
-import { Classe } from '../entidade/classe.js';
+import { classes } from './data/classe.data.js';
 
-export const classes = new Array(
-    new Classe(
-        'Guerreiro',
-        ['Proficiência em arma','Coração de aço', 'Pulso de cura'],
-        800,
-        200
-    ),
-    new Classe(
-        'Mago',
-        ['Proficiência arcana','Coração de cristal', 'Pulso de mana'],
-        200,
-        800
-    ),
-    new Classe(
-        'Ladino',
-        ['Furtividade','Locomoção sombria', 'Envenenar arma'],
-        500,
-        500
-    ),
-);
+export class ClasseRepositorio {
+    escolherClassePorId(id) {
+        return classes.find((classe) => classe.id === id);
+    }
+
+    listarClasses() {
+        return classes;
+    }
+}
+
+//console.log(`${index+1} - Classe: ${classe.nome} - Pontos de Vida: ${classe.pontosVida} - Pontos de Magia: ${classe.pontosMagia} `);
